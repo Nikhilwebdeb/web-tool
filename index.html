@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniTools - Free Online Utility Suite</title>
+    <meta name="description" content="100% free, private browser-based online utility tools for PDF, Images, Text, and Calculators. No registration or server upload required.">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF Lib & JSZip & QRCode Libraries -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .hidden-section { display: none !important; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
+
+    <!-- Header / Navigation -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <a href="#" onclick="showSection('home')" class="text-2xl font-black text-blue-600 flex items-center gap-2.5 tracking-tight group">
+                <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-md group-hover:scale-105 transition">
+                    <i class="fa-solid fa-toolbox text-lg"></i>
+                </div>
+                OmniTools
+            </a>
+            <nav class="hidden md:flex items-center gap-6 font-medium text-slate-600 text-sm">
+                <a href="#" onclick="showSection('home')" class="hover:text-blue-600 transition">Home</a>
+                <a href="#" onclick="showSection('about')" class="hover:text-blue-600 transition">About Us</a>
+                <a href="#" onclick="showSection('privacy')" class="hover:text-blue-600 transition">Privacy Policy</a>
+                <a href="#" onclick="showSection('terms')" class="hover:text-blue-600 transition">Terms</a>
+                <a href="#" onclick="showSection('contact')" class="hover:text-blue-600 transition">Contact</a>
+            </nav>
+            <button onclick="toggleMobileMenu()" class="md:hidden text-slate-600 text-xl p-2 rounded-lg hover:bg-slate-100">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+        <!-- Mobile Dropdown -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 py-3 flex flex-col gap-3 shadow-lg">
+            <a href="#" onclick="showSection('home'); toggleMobileMenu();" class="text-slate-600 font-medium">Home</a>
+            <a href="#" onclick="showSection('about'); toggleMobileMenu();" class="text-slate-600 font-medium">About Us</a>
+            <a href="#" onclick="showSection('privacy'); toggleMobileMenu();" class="text-slate-600 font-medium">Privacy Policy</a>
+            <a href="#" onclick="showSection('terms'); toggleMobileMenu();" class="text-slate-600 font-medium">Terms</a>
+            <a href="#" onclick="showSection('contact'); toggleMobileMenu();" class="text-slate-600 font-medium">Contact</a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
+
+        <!-- HOMEPAGE SECTION -->
+        <section id="sec-home" class="fade-in">
+            <div class="text-center py-10 max-w-3xl mx-auto">
+                <span class="inline-block bg-blue-50 text-blue-700 font-semibold text-xs px-3 py-1 rounded-full mb-3 border border-blue-200">100% Free & Client-Side Secure</span>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">
+                    Fast, Private & Free <span class="text-blue-600">Online Utility Tools</span>
+                </h1>
+                <p class="mt-4 text-slate-600 text-base md:text-lg">
+                    Perform PDF manipulations, image processing, calculations, and conversions instantly inside your browser. Your files never leave your device.
+                </p>
+                <div class="mt-8 relative max-w-xl mx-auto">
+                    <input type="text" id="searchBox" onkeyup="filterTools()" placeholder="Search any tool (e.g. PDF, Compress, QR, Counter)..." 
+                           class="w-full px-5 py-4 pl-12 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-slate-800 bg-white">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-4.5 text-slate-400 text-lg"></i>
+                </div>
+            </div>
+
+            <!-- Tool Cards Grid -->
+            <div id="toolsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+                
+                <!-- Tool 1: JPG to PDF -->
+                <div class="tool-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group" onclick="showTool('jpg-to-pdf')">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:bg-blue-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-lg">JPG to PDF</h3>
+                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Convert multiple JPG, PNG images into a single clean PDF document.</p>
+                </div>
+
+                <!-- Tool 2: Merge PDF -->
+                <div class="tool-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group" onclick="showTool('merge-pdf')">
+                    <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:bg-indigo-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-object-group"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-lg">Merge PDF</h3>
+                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Combine multiple PDF files into one organized single document.</p>
+                </div>
+
+                <!-- Tool 3: Split PDF -->
+                <div class="tool-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group" onclick="showTool('split-pdf')">
+                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:bg-purple-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-scissors"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-lg">Split PDF</h3>
+                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Extract specific pages or split PDF into individual files.</p>
+                </div>
+
+                <!-- Tool 4: Compress PDF -->
+                <div class="tool-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group" onclick="showTool('compress-pdf')">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:bg-emerald-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-compress"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-lg">Compress PDF</h3>
+                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Reduce PDF file size by stripping metadata and optimizing images.</p>
+                </div>
+
+                <!-- Tool 5: Image Compressor -->
+                <div class="tool-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group" onclick="showTool('image-compressor')">
+                    <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:bg-amber-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-file-image"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-lg">Image Compressor</h3>
+                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Shrink JPG and PNG images locally with quality sliders.</p>
+                </div>
+
+                <!-- Tool 6: Image Resizer -->
+                <div class="tool-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group" onclick="showTool('image-resizer')">
+                    <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:bg-rose-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-expand"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-lg">Image Resizer</h3>
+                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Resize images precisely by custom dimensions in pixels or percentages.</p>
+                </div>
+
+                <!-- Tool 7: Word Counter -->
+                <div class="tool-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group" onclick="showTool('word-counter')">
+                    <div class="w-12 h-12 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:bg-cyan-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-font"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-lg">Word & Character Counter</h3>
+                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Real-time word, sentence, and reading time analyzer.</p>
+                </div>
+
+                <!-- Tool 8: QR Generator -->
+                <div class="tool-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group" onclick="showTool('qr-generator')">
+                    <div class="w-12 h-12 bg-violet-50 text-violet-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:bg-violet-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-qrcode"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-lg">QR Code Generator</h3>
+                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Generate custom downloadable QR codes for URLs and text.</p>
+                </div>
+
+                <!-- Tool 9: Percentage Calculator -->
+                <div class="tool-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group" onclick="showTool('percentage-calc')">
+                    <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:bg-orange-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-percent"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-lg">Percentage Calculator</h3>
+                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Quickly calculate margins, discounts, increases, and ratios.</p>
+                </div>
+
+                <!-- Tool 10: Image Format Converter -->
+                <div class="tool-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group" onclick="showTool('image-converter')">
+                    <div class="w-12 h-12 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:bg-teal-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-lg">Image Format Converter</h3>
+                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Convert images between PNG, JPEG, and WebP instantly.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TOOL 1: JPG to PDF -->
+        <section id="sec-jpg-to-pdf" class="hidden-section max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm fade-in">
+            <button onclick="showSection('home')" class="text-sm text-blue-600 font-semibold mb-6 inline-flex items-center gap-1.5 hover:underline">
+                <i class="fa-solid fa-arrow-left"></i> Back to Tools
+            </button>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">JPG to PDF Converter</h2>
+            <p class="text-sm text-slate-500 mb-6">Select or drag & drop multiple JPG/PNG images to compile into a PDF document.</p>
+            
+            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center bg-slate-50 hover:bg-slate-100 transition cursor-pointer" onclick="document.getElementById('jpgInput').click()">
+                <i class="fa-solid fa-cloud-arrow-up text-4xl text-blue-500 mb-3"></i>
+                <p class="font-semibold text-slate-700">Click to upload images or drag them here</p>
+                <p class="text-xs text-slate-400 mt-1">Supports PNG, JPG, JPEG</p>
+                <input type="file" id="jpgInput" multiple accept="image/*" class="hidden" onchange="handleJpgFiles(this)">
+            </div>
+            <div id="jpgFileList" class="mt-4 space-y-2 max-h-60 overflow-y-auto"></div>
+            <button id="jpgActionBtn" onclick="convertJpgToPdf()" class="hidden mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-xl w-full transition shadow-md">
+                Convert Images to PDF
+            </button>
+        </section>
+
+        <!-- TOOL 2: Merge PDF -->
+        <section id="sec-merge-pdf" class="hidden-section max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm fade-in">
+            <button onclick="showSection('home')" class="text-sm text-blue-600 font-semibold mb-6 inline-flex items-center gap-1.5 hover:underline">
+                <i class="fa-solid fa-arrow-left"></i> Back to Tools
+            </button>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Merge PDF Documents</h2>
+            <p class="text-sm text-slate-500 mb-6">Combine two or more PDF files into a single unified document.</p>
+            
+            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center bg-slate-50 hover:bg-slate-100 transition cursor-pointer" onclick="document.getElementById('mergeInput').click()">
+                <i class="fa-solid fa-file-circle-plus text-4xl text-indigo-500 mb-3"></i>
+                <p class="font-semibold text-slate-700">Click to select PDF files</p>
+                <input type="file" id="mergeInput" multiple accept="application/pdf" class="hidden" onchange="handleMergeFiles(this)">
+            </div>
+            <div id="mergeFileList" class="mt-4 space-y-2 max-h-60 overflow-y-auto"></div>
+            <button id="mergeActionBtn" onclick="mergePdfs()" class="hidden mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl w-full transition shadow-md">
+                Merge PDFs Now
+            </button>
+        </section>
+
+        <!-- TOOL 3: Split PDF -->
+        <section id="sec-split-pdf" class="hidden-section max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm fade-in">
+            <button onclick="showSection('home')" class="text-sm text-blue-600 font-semibold mb-6 inline-flex items-center gap-1.5 hover:underline">
+                <i class="fa-solid fa-arrow-left"></i> Back to Tools
+            </button>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Split PDF Document</h2>
+            <p class="text-sm text-slate-500 mb-6">Extract every page of a PDF file into separate single-page PDF files bundled in a ZIP.</p>
+            
+            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center bg-slate-50 hover:bg-slate-100 transition cursor-pointer" onclick="document.getElementById('splitInput').click()">
+                <i class="fa-solid fa-scissors text-4xl text-purple-500 mb-3"></i>
+                <p class="font-semibold text-slate-700">Click to upload a PDF to split</p>
+                <input type="file" id="splitInput" accept="application/pdf" class="hidden" onchange="handleSplitFile(this)">
+            </div>
+            <div id="splitFileInfo" class="mt-4 text-sm font-medium text-slate-700"></div>
+            <button id="splitActionBtn" onclick="splitPdf()" class="hidden mt-6 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 px-6 rounded-xl w-full transition shadow-md">
+                Split Into Individual Pages (ZIP)
+            </button>
+        </section>
+
+        <!-- TOOL 4: Compress PDF -->
+        <section id="sec-compress-pdf" class="hidden-section max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm fade-in">
+            <button onclick="showSection('home')" class="text-sm text-blue-600 font-semibold mb-6 inline-flex items-center gap-1.5 hover:underline">
+                <i class="fa-solid fa-arrow-left"></i> Back to Tools
+            </button>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Compress PDF Document</h2>
+            <p class="text-sm text-slate-500 mb-6">Reduce PDF file size by rewriting and optimizing document structures.</p>
+            
+            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center bg-slate-50 hover:bg-slate-100 transition cursor-pointer" onclick="document.getElementById('compressPdfInput').click()">
+                <i class="fa-solid fa-file-zipper text-4xl text-emerald-500 mb-3"></i>
+                <p class="font-semibold text-slate-700">Click to select PDF file</p>
+                <input type="file" id="compressPdfInput" accept="application/pdf" class="hidden" onchange="handleCompressPdfFile(this)">
+            </div>
+            <div id="compressPdfFileInfo" class="mt-4 text-sm font-medium text-slate-700"></div>
+            <button id="compressPdfActionBtn" onclick="compressPdfFile()" class="hidden mt-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-6 rounded-xl w-full transition shadow-md">
+                Compress PDF
+            </button>
+        </section>
+
+        <!-- TOOL 5: Image Compressor -->
+        <section id="sec-image-compressor" class="hidden-section max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm fade-in">
+            <button onclick="showSection('home')" class="text-sm text-blue-600 font-semibold mb-6 inline-flex items-center gap-1.5 hover:underline">
+                <i class="fa-solid fa-arrow-left"></i> Back to Tools
+            </button>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Image Compressor</h2>
+            <p class="text-sm text-slate-500 mb-6">Compress PNG or JPEG images with adjustable quality ratio.</p>
+            
+            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center bg-slate-50 hover:bg-slate-100 transition cursor-pointer" onclick="document.getElementById('imgCompressInput').click()">
+                <i class="fa-solid fa-images text-4xl text-amber-500 mb-3"></i>
+                <p class="font-semibold text-slate-700">Click to select image</p>
+                <input type="file" id="imgCompressInput" accept="image/*" class="hidden" onchange="handleImgCompressFile(this)">
+            </div>
+            <div id="imgCompressSettings" class="hidden mt-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Quality: <span id="qualityVal">80</span>%</label>
+                    <input type="range" id="qualityRange" min="10" max="95" value="80" oninput="document.getElementById('qualityVal').innerText = this.value" class="w-full accent-amber-500">
+                </div>
+                <button onclick="compressImage()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 px-6 rounded-xl w-full transition shadow-md">
+                    Compress Image
+                </button>
+            </div>
+            <div id="imgCompressResult" class="mt-6 text-center"></div>
+        </section>
+
+        <!-- TOOL 6: Image Resizer -->
+        <section id="sec-image-resizer" class="hidden-section max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm fade-in">
+            <button onclick="showSection('home')" class="text-sm text-blue-600 font-semibold mb-6 inline-flex items-center gap-1.5 hover:underline">
+                <i class="fa-solid fa-arrow-left"></i> Back to Tools
+            </button>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Image Dimension Resizer</h2>
+            <p class="text-sm text-slate-500 mb-6">Resize image width and height in exact pixel dimensions.</p>
+            
+            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center bg-slate-50 hover:bg-slate-100 transition cursor-pointer" onclick="document.getElementById('imgResizeInput').click()">
+                <i class="fa-solid fa-expand text-4xl text-rose-500 mb-3"></i>
+                <p class="font-semibold text-slate-700">Click to select image</p>
+                <input type="file" id="imgResizeInput" accept="image/*" class="hidden" onchange="handleImgResizeFile(this)">
+            </div>
+            <div id="imgResizeSettings" class="hidden mt-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Width (px)</label>
+                        <input type="number" id="resizeWidth" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Height (px)</label>
+                        <input type="number" id="resizeHeight" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                    </div>
+                </div>
+                <button onclick="resizeImage()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-3.5 px-6 rounded-xl w-full transition shadow-md">
+                    Resize Image
+                </button>
+            </div>
+            <div id="imgResizeResult" class="mt-6 text-center"></div>
+        </section>
+
+        <!-- TOOL 7: Word Counter -->
+        <section id="sec-word-counter" class="hidden-section max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm fade-in">
+            <button onclick="showSection('home')" class="text-sm text-blue-600 font-semibold mb-6 inline-flex items-center gap-1.5 hover:underline">
+                <i class="fa-solid fa-arrow-left"></i> Back to Tools
+            </button>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Word & Character Counter</h2>
+            <p class="text-sm text-slate-500 mb-4">Paste text below to check words, characters, sentences, and reading duration.</p>
+            
+            <textarea id="wordCounterInput" oninput="updateWordCount()" rows="8" placeholder="Type or paste your text here..." 
+                      class="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:outline-none text-slate-800"></textarea>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 text-center">
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                    <span id="cntWords" class="text-3xl font-black text-cyan-600">0</span>
+                    <p class="text-xs text-slate-500 mt-1 uppercase font-semibold">Words</p>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                    <span id="cntChars" class="text-3xl font-black text-cyan-600">0</span>
+                    <p class="text-xs text-slate-500 mt-1 uppercase font-semibold">Characters</p>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                    <span id="cntSentences" class="text-3xl font-black text-cyan-600">0</span>
+                    <p class="text-xs text-slate-500 mt-1 uppercase font-semibold">Sentences</p>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                    <span id="cntReadingTime" class="text-3xl font-black text-cyan-600">0m</span>
+                    <p class="text-xs text-slate-500 mt-1 uppercase font-semibold">Reading Time</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOOL 8: QR Code Generator -->
+        <section id="sec-qr-generator" class="hidden-section max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm text-center fade-in">
+            <button onclick="showSection('home')" class="text-sm text-blue-600 font-semibold mb-6 inline-flex items-center gap-1.5 float-left hover:underline">
+                <i class="fa-solid fa-arrow-left"></i> Back to Tools
+            </button>
+            <div class="clear-both"></div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">QR Code Generator</h2>
+            <p class="text-sm text-slate-500 mb-6">Create high-resolution QR codes instantly for any URL or text.</p>
+            
+            <input type="text" id="qrText" placeholder="Enter URL or text (e.g. https://google.com)..." value="https://google.com" 
+                   class="w-full p-3.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none mb-4">
+            <button onclick="generateQR()" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-3.5 px-6 rounded-xl w-full transition shadow-md">
+                Generate QR Code
+            </button>
+            
+            <div id="qrResult" class="mt-8 flex justify-center p-4 bg-slate-50 rounded-2xl border border-slate-200"></div>
+        </section>
+
+        <!-- TOOL 9: Percentage Calculator -->
+        <section id="sec-percentage-calc" class="hidden-section max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm fade-in">
+            <button onclick="showSection('home')" class="text-sm text-blue-600 font-semibold mb-6 inline-flex items-center gap-1.5 hover:underline">
+                <i class="fa-solid fa-arrow-left"></i> Back to Tools
+            </button>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Percentage Calculator</h2>
+            <p class="text-sm text-slate-500 mb-6">Calculate percentage values easily.</p>
+            
+            <div class="space-y-4 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                <div class="flex flex-col sm:flex-row items-center gap-3">
+                    <span class="text-slate-700 font-medium">What is</span>
+                    <input type="number" id="pNum1" value="20" oninput="calculatePercentage()" class="w-full sm:w-24 p-2.5 border border-slate-300 rounded-lg text-center">
+                    <span class="text-slate-700 font-medium">% of</span>
+                    <input type="number" id="pNum2" value="150" oninput="calculatePercentage()" class="w-full sm:w-28 p-2.5 border border-slate-300 rounded-lg text-center">
+                    <span class="text-slate-700 font-medium">=</span>
+                    <span id="pResult1" class="font-bold text-orange-600 text-xl">30</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOOL 10: Image Format Converter -->
+        <section id="sec-image-converter" class="hidden-section max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm fade-in">
+            <button onclick="showSection('home')" class="text-sm text-blue-600 font-semibold mb-6 inline-flex items-center gap-1.5 hover:underline">
+                <i class="fa-solid fa-arrow-left"></i> Back to Tools
+            </button>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Image Format Converter</h2>
+            <p class="text-sm text-slate-500 mb-6">Convert your images between PNG, JPEG, and WebP format.</p>
+            
+            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center bg-slate-50 hover:bg-slate-100 transition cursor-pointer" onclick="document.getElementById('imgConvertInput').click()">
+                <i class="fa-solid fa-file-arrow-down text-4xl text-teal-500 mb-3"></i>
+                <p class="font-semibold text-slate-700">Click to select image</p>
+                <input type="file" id="imgConvertInput" accept="image/*" class="hidden" onchange="handleImgConvertFile(this)">
+            </div>
+            <div id="imgConvertSettings" class="hidden mt-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Target Format</label>
+                    <select id="targetFormat" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <option value="image/jpeg">JPEG</option>
+                        <option value="image/png">PNG</option>
+                        <option value="image/webp">WebP</option>
+                    </select>
+                </div>
+                <button onclick="convertImageFormat()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 px-6 rounded-xl w-full transition shadow-md">
+                    Convert Image Format
+                </button>
+            </div>
+            <div id="imgConvertResult" class="mt-6 text-center"></div>
+        </section>
+
+        <!-- STATIC PAGES -->
+        <section id="sec-about" class="hidden-section max-w-3xl mx-auto bg-white p-8 rounded-2xl border border-slate-200 shadow-sm fade-in">
+            <h2 class="text-3xl font-bold mb-4 text-slate-900">About OmniTools</h2>
+            <p class="text-slate-600 leading-relaxed mb-4">OmniTools is an advanced web-based suite of high-performance utility tools. We built OmniTools with privacy as our core foundation: all operations run entirely within your web browser using modern JavaScript execution.</p>
+            <p class="text-slate-600 leading-relaxed">No data, documents, or images are ever uploaded to external cloud storage or servers.</p>
+        </section>
+
+        <section id="sec-privacy" class="hidden-section max-w-3xl mx-auto bg-white p-8 rounded-2xl border border-slate-200 shadow-sm fade-in">
+            <h2 class="text-3xl font-bold mb-4 text-slate-900">Privacy Policy</h2>
+            <p class="text-slate-600 leading-relaxed mb-4">Your privacy is fully protected. Because OmniTools performs all computations locally on your machine, your files never leave your computer device.</p>
+            <p class="text-slate-600 leading-relaxed">We may use standard web analytics cookies to understand page traffic and improve our services.</p>
+        </section>
+
+        <section id="sec-terms" class="hidden-section max-w-3xl mx-auto bg-white p-8 rounded-2xl border border-slate-200 shadow-sm fade-in">
+            <h2 class="text-3xl font-bold mb-4 text-slate-900">Terms of Service</h2>
+            <p class="text-slate-600 leading-relaxed mb-4">By accessing and using OmniTools, you agree to use our free browser utilities responsibly and lawfully.</p>
+            <p class="text-slate-600 leading-relaxed">Tools are provided "as is" without warranty of any kind.</p>
+        </section>
+
+        <section id="sec-contact" class="hidden-section max-w-3xl mx-auto bg-white p-8 rounded-2xl border border-slate-200 shadow-sm fade-in">
+            <h2 class="text-3xl font-bold mb-4 text-slate-900">Contact Us</h2>
+            <p class="text-slate-600 mb-4">Have feedback, feature requests, or questions? Reach out to our team at:</p>
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 inline-block font-semibold text-blue-600">
+                support@omnitools.example
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-16 py-8 text-center text-sm text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p>&copy; 2026 OmniTools. All rights reserved. 100% Client-side browser utility suite.</p>
+            <div class="flex gap-6">
+                <a href="#" onclick="showSection('privacy')" class="hover:text-blue-600">Privacy Policy</a>
+                <a href="#" onclick="showSection('terms')" class="hover:text-blue-600">Terms of Service</a>
+                <a href="#" onclick="showSection('contact')" class="hover:text-blue-600">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden-section'));
+            document.getElementById('sec-' + id).classList.remove('hidden-section');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showTool(toolId) {
+            showSection(toolId);
+        }
+
+        function toggleMobileMenu() {
+            let menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function filterTools() {
+            let input = document.getElementById('searchBox').value.toLowerCase();
+            let cards = document.querySelectorAll('.tool-card');
+            cards.forEach(card => {
+                let text = card.innerText.toLowerCase();
+                card.style.display = text.includes(input) ? "block" : "none";
+            });
+        }
+
+        /* --- Tool 1: JPG to PDF --- */
+        let jpgFilesArray = [];
+        function handleJpgFiles(input) {
+            jpgFilesArray = Array.from(input.files);
+            let listDiv = document.getElementById('jpgFileList');
+            listDiv.innerHTML = "";
+            jpgFilesArray.forEach((file, idx) => {
+                listDiv.innerHTML += `<div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center text-sm"><span class="truncate">${file.name}</span><span class="text-slate-400 text-xs">${(file.size/1024).toFixed(1)} KB</span></div>`;
+            });
+            if(jpgFilesArray.length > 0) {
+                document.getElementById('jpgActionBtn').classList.remove('hidden');
+            }
+        }
+
+        async function convertJpgToPdf() {
+            if(jpgFilesArray.length === 0) return;
+            const pdfDoc = await PDFLib.PDFDocument.create();
+            for(let file of jpgFilesArray) {
+                const arrayBuffer = await file.arrayBuffer();
+                let image;
+                if(file.type === "image/png") {
+                    image = await pdfDoc.embedPng(arrayBuffer);
+                } else {
+                    image = await pdfDoc.embedJpeg(arrayBuffer);
+                }
+                const page = pdfDoc.addPage([image.width, image.height]);
+                page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+            }
+            const pdfBytes = await pdfDoc.save();
+            downloadBlob(new Blob([pdfBytes], { type: 'application/pdf' }), "converted-images.pdf");
+        }
+
+        /* --- Tool 2: Merge PDF --- */
+        let mergeFilesArray = [];
+        function handleMergeFiles(input) {
+            mergeFilesArray = Array.from(input.files);
+            let listDiv = document.getElementById('mergeFileList');
+            listDiv.innerHTML = "";
+            mergeFilesArray.forEach((file) => {
+                listDiv.innerHTML += `<div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center text-sm"><span class="truncate">${file.name}</span></div>`;
+            });
+            if(mergeFilesArray.length > 1) {
+                document.getElementById('mergeActionBtn').classList.remove('hidden');
+            }
+        }
+
+        async function mergePdfs() {
+            if(mergeFilesArray.length < 2) return;
+            const mergedPdf = await PDFLib.PDFDocument.create();
+            for(let file of mergeFilesArray) {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
+                const copiedPages = await mergedPdf.copyPages(pdf, pdf.getgetPageIndices ? pdf.getgetPageIndices() : Array.from({length: pdf.getPageCount()}, (_, i) => i));
+                copiedPages.forEach((page) => mergedPdf.addPage(page));
+            }
+            const mergedPdfBytes = await mergedPdf.save();
+            downloadBlob(new Blob([mergedPdfBytes], { type: 'application/pdf' }), "merged-document.pdf");
+        }
+
+        /* --- Tool 3: Split PDF --- */
+        let splitFileObj = null;
+        function handleSplitFile(input) {
+            splitFileObj = input.files[0];
+            if(splitFileObj) {
+                document.getElementById('splitFileInfo').innerText = `Loaded: ${splitFileObj.name} (${(splitFileObj.size/1024).toFixed(1)} KB)`;
+                document.getElementById('splitActionBtn').classList.remove('hidden');
+            }
+        }
+
+        async function splitPdf() {
+            if(!splitFileObj) return;
+            const arrayBuffer = await splitFileObj.arrayBuffer();
+            const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
+            const pageCount = pdf.getPageCount();
+            const zip = new JSZip();
+            for(let i=0; i<pageCount; i++) {
+                const subPdf = await PDFLib.PDFDocument.create();
+                const [copiedPage] = await subPdf.copyPages(pdf, [i]);
+                subPdf.addPage(copiedPage);
+                const bytes = await subPdf.save();
+                zip.file(`page-${i+1}.pdf`, bytes);
+            }
+            const zipContent = await zip.generateAsync({type:"blob"});
+            downloadBlob(zipContent, "split-pages.zip");
+        }
+
+        /* --- Tool 4: Compress PDF --- */
+        let compressPdfFileObj = null;
+        function handleCompressPdfFile(input) {
+            compressPdfFileObj = input.files[0];
+            if(compressPdfFileObj) {
+                document.getElementById('compressPdfFileInfo').innerText = `Loaded: ${compressPdfFileObj.name} (${(compressPdfFileObj.size/1024).toFixed(1)} KB)`;
+                document.getElementById('compressPdfActionBtn').classList.remove('hidden');
+            }
+        }
+
+        async function compressPdfFile() {
+            if(!compressPdfFileObj) return;
+            const arrayBuffer = await compressPdfFileObj.arrayBuffer();
+            const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
+            const pdfBytes = await pdf.save({ useObjectStreams: true });
+            downloadBlob(new Blob([pdfBytes], { type: 'application/pdf' }), "compressed-document.pdf");
+        }
+
+        /* --- Tool 5: Image Compressor --- */
+        let imgCompressObj = null;
+        function handleImgCompressFile(input) {
+            imgCompressObj = input.files[0];
+            if(imgCompressObj) {
+                document.getElementById('imgCompressSettings').classList.remove('hidden');
+            }
+        }
+
+        function compressImage() {
+            if(!imgCompressObj) return;
+            let quality = parseInt(document.getElementById('qualityRange').value) / 100;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let img = new Image();
+                img.onload = function() {
+                    let canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    let ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    canvas.toBlob((blob) => {
+                        let url = URL.createObjectURL(blob);
+                        document.getElementById('imgCompressResult').innerHTML = `<a href="${url}" download="compressed-image.jpg" class="inline-block bg-emerald-600 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-emerald-700">Download Compressed Image (${(blob.size/1024).toFixed(1)} KB)</a>`;
+                    }, 'image/jpeg', quality);
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(imgCompressObj);
+        }
+
+        /* --- Tool 6: Image Resizer --- */
+        let imgResizeObj = null;
+        function handleImgResizeFile(input) {
+            imgResizeObj = input.files[0];
+            if(imgResizeObj) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let img = new Image();
+                    img.onload = function() {
+                        document.getElementById('resizeWidth').value = img.width;
+                        document.getElementById('resizeHeight').value = img.height;
+                        document.getElementById('imgResizeSettings').classList.remove('hidden');
+                    }
+                    img.src = e.target.result;
+                }
+                reader.readAsDataURL(imgResizeObj);
+            }
+        }
+
+        function resizeImage() {
+            if(!imgResizeObj) return;
+            let w = parseInt(document.getElementById('resizeWidth').value);
+            let h = parseInt(document.getElementById('resizeHeight').value);
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let img = new Image();
+                img.onload = function() {
+                    let canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    let ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    canvas.toBlob((blob) => {
+                        let url = URL.createObjectURL(blob);
+                        document.getElementById('imgResizeResult').innerHTML = `<a href="${url}" download="resized-image.jpg" class="inline-block bg-rose-600 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-rose-700">Download Resized Image</a>`;
+                    }, 'image/jpeg');
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(imgResizeObj);
+        }
+
+        /* --- Tool 7: Word Counter --- */
+        function updateWordCount() {
+            let text = document.getElementById('wordCounterInput').value.trim();
+            let words = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
+            let chars = text.length;
+            let sentences = text ? text.split(/[.!?]+/).filter(s => s.trim().length > 0).length : 0;
+            let readingTime = Math.ceil(words / 200);
+
+            document.getElementById('cntWords').innerText = words;
+            document.getElementById('cntChars').innerText = chars;
+            document.getElementById('cntSentences').innerText = sentences;
+            document.getElementById('cntReadingTime').innerText = readingTime + "m";
+        }
+
+        /* --- Tool 8: QR Generator --- */
+        function generateQR() {
+            let qrContainer = document.getElementById('qrResult');
+            qrContainer.innerHTML = "";
+            let text = document.getElementById('qrText').value;
+            if (text.trim() !== "") {
+                new QRCode(qrContainer, { text: text, width: 200, height: 200 });
+            }
+        }
+        // Initial QR generation
+        generateQR();
+
+        /* --- Tool 9: Percentage Calculator --- */
+        function calculatePercentage() {
+            let n1 = parseFloat(document.getElementById('pNum1').value) || 0;
+            let n2 = parseFloat(document.getElementById('pNum2').value) || 0;
+            let res = (n1 * n2) / 100;
+            document.getElementById('pResult1').innerText = res;
+        }
+
+        /* --- Tool 10: Image Format Converter --- */
+        let imgConvertObj = null;
+        function handleImgConvertFile(input) {
+            imgConvertObj = input.files[0];
+            if(imgConvertObj) {
+                document.getElementById('imgConvertSettings').classList.remove('hidden');
+            }
+        }
+
+        function convertImageFormat() {
+            if(!imgConvertObj) return;
+            let targetType = document.getElementById('targetFormat').value;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let img = new Image();
+                img.onload = function() {
+                    let canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    let ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    canvas.toBlob((blob) => {
+                        let url = URL.createObjectURL(blob);
+                        let ext = targetType.split('/')[1];
+                        document.getElementById('imgConvertResult').innerHTML = `<a href="${url}" download="converted-image.${ext}" class="inline-block bg-teal-600 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-teal-700">Download Converted (${ext.toUpperCase()})</a>`;
+                    }, targetType);
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(imgConvertObj);
+        }
+
+        /* Helper download function */
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
